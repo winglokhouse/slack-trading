@@ -6,6 +6,26 @@ import matplotlib.dates as mdates
 from mpl_finance import candlestick_ohlc
 import talib as TA
 
+from os import listdir
+import boto3
+
+def download_data_from_s3(s3_bucket, local_path):
+    session = boto3.Session(region_name='ap-east-1')
+    s3 = session.client('s3', endpoint_url='https://s3.ap-east-1.amazonaws.com')
+    response = s3.list_objects(Bucket=s3_bucket)
+    file_list = [k['Key'] for k in response['Contents']]
+    for key in file_list:
+        local_file = local_path + '/' + key
+        response = s3.download_file(Bucket=s3_bucket, Key=key, Filename=local_file)
+
+def upload_data_to_s3(s3_bucket, local_path):
+    session = boto3.Session(region_name='ap-east-1')
+    s3 = session.client('s3', endpoint_url='https://s3.ap-east-1.amazonaws.com')
+    file_list = listdir(local_path)
+    for key in file_list:
+        local_file = local_path + '/' + key
+        response = s3.upload_file(Bucket=s3_bucket, Key=key, Filename=local_file)
+
 def plot_two_stocks(stock1, stock2, prevday_returns, today_returns, start):
     if '.prev' in stock1:
         stock1 = stock1.split('.prev')[0]
