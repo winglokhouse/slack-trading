@@ -26,15 +26,16 @@ def upload_data_to_s3(s3_bucket, local_path):
         local_file = local_path + '/' + key
         response = s3.upload_file(Bucket=s3_bucket, Key=key, Filename=local_file)
 
-def plot_two_stocks(stock1, stock2, prevday_returns, today_returns, start):
+
+def plot_two_stocks(stock1, stock2, prevday_returns, today_returns, start, end):
     if '.prev' in stock1:
         stock1 = stock1.split('.prev')[0]
         print(stock1)
     #
-    df1 = yf.download(stock1, start=start)
+    df1 = yf.download(stock1, start=start, end=end)
     df1['Date'] = df1.index
     df1['Date'] = df1['Date'].apply(mdates.date2num)
-    df2 = yf.download(stock2, start=start)
+    df2 = yf.download(stock2, start=start, end=end)
     df2['Date'] = df2.index
     df2['Date'] = df2['Date'].apply(mdates.date2num)
     #
